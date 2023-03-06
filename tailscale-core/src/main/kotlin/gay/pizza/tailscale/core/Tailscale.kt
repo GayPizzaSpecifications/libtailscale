@@ -1,10 +1,9 @@
 package gay.pizza.tailscale.core
 
-import com.sun.jna.Native
 import gay.pizza.tailscale.lowlevel.*
 
-class Tailscale(private val lib: LibTailscale = LibTailscaleLoader.load()) {
-  private val handle: TailscaleHandle
+class Tailscale(internal val lib: LibTailscale = LibTailscaleLoader.load()) {
+  private val handle: TailscaleHandle = lib.tailscale_new()
 
   var hostname: String
     get() = throw UnsupportedOperationException("API does not support reading.")
@@ -26,10 +25,6 @@ class Tailscale(private val lib: LibTailscale = LibTailscaleLoader.load()) {
     get() = throw UnsupportedOperationException("API does not support reading.")
     set(value) = check(lib.tailscale_set_ephemeral(handle, if (value) 0 else 1))
 
-  init {
-    handle = lib.tailscale_new()
-  }
-
   fun start() {
     check(lib.tailscale_start(handle))
   }
@@ -48,6 +43,12 @@ class Tailscale(private val lib: LibTailscale = LibTailscaleLoader.load()) {
     return TailscaleConn(this, connHandle.value)
   }
 
+  fun listen(network: String, addr: String): TailscaleListener {
+    val listenerHandle = TailscaleListenerHandleOut()
+    check(lib.tailscale_listen(handle, network, addr, listenerHandle))
+    return TailscaleListener(this, listenerHandle.value)
+  }
+
   private fun getLastErrorMessage(): String {
     var buffer = CharArray(128)
     while (true) {
@@ -62,7 +63,7 @@ class Tailscale(private val lib: LibTailscale = LibTailscaleLoader.load()) {
     return String(buffer)
   }
 
-  private fun check(error: TailscaleError) {
+  internal fun check(error: TailscaleError) {
     if (error == 0) return
     throw RuntimeException("Tailscale Error: Code: ${error}, Message: ${getLastErrorMessage()}")
   }

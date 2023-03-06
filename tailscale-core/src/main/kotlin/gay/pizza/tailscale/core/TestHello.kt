@@ -5,7 +5,15 @@ object TestHello {
   fun main(args: Array<String>) {
     val tailscale = Tailscale()
     tailscale.up()
-    val conn = tailscale.dial("tcp","100.81.142.128:8989")
-    println(conn.handle)
+    val listener = tailscale.listen("tcp",":8989")
+    while (true) {
+      val conn = listener.accept()
+      val out = conn.outputStream()
+      val writer = out.bufferedWriter()
+      writer.write("Hello World")
+      writer.newLine()
+      writer.close()
+      conn.close()
+    }
   }
 }
