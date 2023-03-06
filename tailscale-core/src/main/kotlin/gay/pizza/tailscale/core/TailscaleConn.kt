@@ -1,7 +1,7 @@
 package gay.pizza.tailscale.core
 
 import com.sun.jna.platform.unix.LibC
-import gay.pizza.tailscale.lowlevel.TailscaleConnHandle
+import gay.pizza.tailscale.lib.TailscaleConnHandle
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream

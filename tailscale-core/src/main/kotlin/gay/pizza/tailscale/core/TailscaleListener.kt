@@ -1,7 +1,7 @@
 package gay.pizza.tailscale.core
 
-import gay.pizza.tailscale.lowlevel.TailscaleConnHandleOut
-import gay.pizza.tailscale.lowlevel.TailscaleListenerHandle
+import gay.pizza.tailscale.lib.TailscaleConnHandleOut
+import gay.pizza.tailscale.lib.TailscaleListenerHandle
 
 class TailscaleListener(private val tailscale: Tailscale, private val handle: TailscaleListenerHandle) {
   fun accept(): TailscaleConn {

@@ -1,6 +1,6 @@
 package gay.pizza.tailscale.core
 
-import gay.pizza.tailscale.lowlevel.*
+import gay.pizza.tailscale.lib.*
 
 class Tailscale(internal val lib: LibTailscale = LibTailscaleLoader.load()) {
   private val handle: TailscaleHandle = lib.tailscale_new()

@@ -1,5 +1,5 @@
 plugins {
-  java
+  tailscale_module
 }
 
 val release = "libtailscale-java-0.0.1"

@@ -1,4 +1,4 @@
-package gay.pizza.tailscale.lowlevel
+package gay.pizza.tailscale.lib
 
 import com.sun.jna.Library
 import com.sun.jna.ptr.IntByReference

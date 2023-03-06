@@ -1,6 +1,8 @@
-package gay.pizza.tailscale.core
+package gay.pizza.tailscale.examples.helloworld
 
-object TestHello {
+import gay.pizza.tailscale.core.Tailscale
+
+object HelloWorldListener {
   @JvmStatic
   fun main(args: Array<String>) {
     val tailscale = Tailscale()
