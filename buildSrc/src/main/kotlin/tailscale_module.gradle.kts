@@ -4,6 +4,12 @@ plugins {
 }
 
 publishing {
+  publications {
+    create<MavenPublication>("maven") {
+      from(components["kotlin"])
+    }
+  }
+
   repositories {
     mavenLocal()
 
