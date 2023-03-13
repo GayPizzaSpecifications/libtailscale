@@ -2,7 +2,7 @@ package gay.pizza.tailscale.core
 
 import gay.pizza.tailscale.lib.*
 
-class Tailscale(internal val lib: LibTailscale = LibTailscaleLoader.load()) {
+class TailscaleServer(internal val lib: LibTailscale = LibTailscaleLoader.load()) {
   private val handle: TailscaleHandle = lib.tailscale_new()
 
   var hostname: String

@@ -2,21 +2,21 @@ plugins {
   tailscale_module
 }
 
-val release = "libtailscale-java-0.0.1"
+val release = "libtailscale-java-0.1.0"
 val repository = "https://github.com/GayPizzaSpecifications/libtailscale-build"
 val downloadAllUrl = "${repository}/releases/download/${release}/libtailscale-all.zip"
+val downloadZipFile = project.file("${release}.zip")
 
 val downloadPlatformLibraries = tasks.register("downloadPlatformLibraries") {
-  val zipFile = project.file("libtailscale-all.zip")
-  outputs.file(zipFile)
+  outputs.file(downloadZipFile)
 
   doLast {
-    if (zipFile.exists()) {
+    if (downloadZipFile.exists()) {
       return@doLast
     }
 
     ant.withGroovyBuilder {
-      "get"("src" to downloadAllUrl, "dest" to "libtailscale-all.zip")
+      "get"("src" to downloadAllUrl, "dest" to downloadZipFile.name)
     }
   }
 }
@@ -28,7 +28,7 @@ val assemblePlatformLibraries = tasks.register("assemblePlatformLibraries") {
 
   doLast {
     project.file(platformLibrariesPath).deleteRecursively()
-    zipTree("libtailscale-all.zip").forEach { file ->
+    zipTree(downloadZipFile).forEach { file ->
       val parts = file.name.split("-").map { it.split(".") }.flatten()
       val lib = parts[0]
       val platform = parts[1]
@@ -43,8 +43,8 @@ val assemblePlatformLibraries = tasks.register("assemblePlatformLibraries") {
 }
 
 tasks.clean.get().doLast {
-  project.file("libtailscale-all.zip").delete()
-  project.file("platformLibrariesPath").deleteRecursively()
+  downloadZipFile.delete()
+  project.file(platformLibrariesPath).deleteRecursively()
 }
 
 tasks.processResources.get().dependsOn(assemblePlatformLibraries)
