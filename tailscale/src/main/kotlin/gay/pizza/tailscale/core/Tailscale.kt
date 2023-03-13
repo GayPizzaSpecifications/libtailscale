@@ -2,7 +2,7 @@ package gay.pizza.tailscale.core
 
 import gay.pizza.tailscale.lib.*
 
-class TailscaleServer(internal val lib: LibTailscale = LibTailscaleLoader.load()) {
+class Tailscale(internal val lib: LibTailscale = LibTailscaleLoader.load()) {
   private val handle: TailscaleHandle = lib.tailscale_new()
 
   var hostname: String
@@ -66,5 +66,13 @@ class TailscaleServer(internal val lib: LibTailscale = LibTailscaleLoader.load()
   internal fun check(error: TailscaleError) {
     if (error == 0) return
     throw RuntimeException("Tailscale Error: Code: ${error}, Message: ${getLastErrorMessage()}")
+  }
+
+  companion object {
+    fun configureAndUp(configure: Tailscale.() -> Unit = {}): Tailscale {
+      val tailscale = Tailscale().apply(configure)
+      tailscale.up()
+      return tailscale
+    }
   }
 }
