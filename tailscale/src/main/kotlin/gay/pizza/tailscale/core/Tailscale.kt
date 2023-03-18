@@ -40,7 +40,7 @@ class Tailscale(internal val lib: LibTailscale = LibTailscaleLoader.load()) {
   fun dial(network: String, addr: String): TailscaleConn {
     val connHandle = TailscaleConnHandleOut()
     check(lib.tailscale_dial(handle, network, addr, connHandle))
-    return TailscaleConn(this, connHandle.value)
+    return TailscaleConn(connHandle.value)
   }
 
   fun listen(network: String, addr: String): TailscaleListener {

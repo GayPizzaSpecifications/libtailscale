@@ -8,7 +8,7 @@ import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 
-class TailscaleConn(private val tailscale: Tailscale, private val handle: TailscaleConnHandle) {
+class TailscaleConn(private val handle: TailscaleConnHandle) {
   private val file = File("/dev/fd/${handle}")
 
   fun inputStream(): InputStream = file.inputStream()

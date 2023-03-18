@@ -7,7 +7,7 @@ class TailscaleListener(private val tailscale: Tailscale, private val handle: Ta
   fun accept(): TailscaleConn {
     val out = TailscaleConnHandleOut()
     tailscale.check(tailscale.lib.tailscale_accept(handle, out))
-    return TailscaleConn(tailscale, out.value)
+    return TailscaleConn(out.value)
   }
 
   fun threadedAcceptLoop(until: () -> Boolean = { true }, handler: (TailscaleConn) -> Unit) {
