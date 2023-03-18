@@ -7,8 +7,9 @@ import java.io.BufferedWriter
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.Socket
 
-class TailscaleConn(private val handle: TailscaleConnHandle) {
+class TailscaleConn(val handle: TailscaleConnHandle) {
   private val file = File("/dev/fd/${handle}")
 
   fun inputStream(): InputStream = file.inputStream()
