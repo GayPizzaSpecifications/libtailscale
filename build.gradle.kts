@@ -1,6 +1,6 @@
 allprojects {
   group = "gay.pizza.tailscale"
-  version = "0.1.1-SNAPSHOT"
+  version = "0.1.2-SNAPSHOT"
 }
 
 tasks.withType<Wrapper> {

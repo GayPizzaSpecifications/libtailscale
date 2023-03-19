@@ -1,6 +1,8 @@
 package gay.pizza.tailscale.examples.helloworld
 
 import gay.pizza.tailscale.core.Tailscale
+import java.nio.ByteBuffer
+import java.nio.channels.ClosedChannelException
 
 object HelloWorldListener {
   @JvmStatic
@@ -11,15 +13,22 @@ object HelloWorldListener {
 
     val listener = tailscale.listen("tcp",":8989")
     listener.threadedAcceptLoop { conn ->
-      val input = conn.inputStream()
-      val output = conn.outputStream()
+      val channel = conn.openReadWriteChannel()
 
       try {
-        input.copyTo(output)
+        val buffer = ByteBuffer.allocate(2048)
+        while (channel.isOpen) {
+          val size = channel.read(buffer)
+          if (size < 0) {
+            break
+          }
+          channel.write(buffer.flip())
+          buffer.clear()
+        }
+      } catch (_: ClosedChannelException) {
       } finally {
-        input.close()
-        output.close()
-        conn.close()
+        channel.close()
+        channel.close()
       }
     }
   }
