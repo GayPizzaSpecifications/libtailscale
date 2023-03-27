@@ -4,4 +4,5 @@ plugins {
 
 dependencies {
   implementation(project(":tailscale"))
+  implementation(project(":tailscale-channel"))
 }
