@@ -2,7 +2,9 @@ package gay.pizza.tailscale.lib
 
 import com.sun.jna.Native
 import gay.pizza.tailscale.platforms.TailscalePlatformMarker
-import java.io.File
+import java.nio.file.Files
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.outputStream
 
 object LibTailscaleLoader {
   private val osName = System.getProperty("os.name")?.lowercase() ?: "unknown"
@@ -15,7 +17,7 @@ object LibTailscaleLoader {
     else -> "unknown"
   }
 
-  private fun goOsToSuffix(): String = when (os) {
+  private fun goOsToSuffix(): String = when (goOs) {
     "linux" -> "so"
     "darwin" -> "dylib"
     "windows" -> "dll"
@@ -32,23 +34,33 @@ object LibTailscaleLoader {
     else -> "unknown"
   }
 
-  private val os: String = javaToGoOs()
-  private val arch: String = javaToGoArch()
+  private val goOs: String = javaToGoOs()
+  private val goArch: String = javaToGoArch()
   private val libSuffix: String = goOsToSuffix()
+  private val isUniversalSupported: Boolean = (goOs == "darwin") && when (goArch) {
+    "amd64" -> true
+    "arm64" -> true
+    else -> false
+  }
 
-  fun libraryResourcePath(): String = "${os}/${arch}/libtailscale.${libSuffix}"
+  private val resourceBasePath: String = when {
+    isUniversalSupported -> "${goOs}/universal"
+    else -> "${goOs}/${goArch}"
+  }
+
+  private val libraryResourcePath: String = "${resourceBasePath}/libtailscale.${libSuffix}"
 
   private fun extract(): String {
-    val stream = TailscalePlatformMarker::class.java.getResourceAsStream(libraryResourcePath())
-      ?: throw RuntimeException("Unable to load library ${libraryResourcePath()}")
-    val temporaryFile = File.createTempFile("libtailscale", ".${libSuffix}")
+    val stream = TailscalePlatformMarker::class.java.getResourceAsStream(libraryResourcePath)
+      ?: throw RuntimeException("Unable to load library $libraryResourcePath")
+    val temporaryFile = Files.createTempFile("libtailscale", ".${libSuffix}")
     val output = temporaryFile.outputStream()
     stream.use { input ->
       output.use { out ->
         input.copyTo(out)
       }
     }
-    return temporaryFile.absolutePath
+    return temporaryFile.absolutePathString()
   }
 
   private val path by lazy { extract() }

@@ -35,6 +35,10 @@ val assemblePlatformLibraries = tasks.register("assemblePlatformLibraries") {
       val arch = parts[2]
       val suffix = parts[3]
 
+      if (platform == "darwin" && (arch in listOf("arm64", "amd64"))) {
+        return@forEach
+      }
+
       val outputFile = project.file("${platformLibrariesPath}/${platform}/${arch}/${lib}.${suffix}")
       outputFile.parentFile.mkdirs()
       file.copyTo(outputFile)
