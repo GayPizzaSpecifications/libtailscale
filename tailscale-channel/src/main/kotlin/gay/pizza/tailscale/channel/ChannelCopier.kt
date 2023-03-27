@@ -28,21 +28,34 @@ class ChannelCopier(
   }
 
   fun copyUntilClose(autoCloseSides: Boolean = true): ChannelCopierState {
-    while (true) {
-      val state = copyOneBuffer()
-      if (state == ChannelCopierState.ChannelClosed) {
-        if (autoCloseSides) {
-          sink.close()
-          source.close()
+    var state = ChannelCopierState.CopiedBuffer
+    try {
+      while (true) {
+        state = copyOneBuffer()
+        if (state == ChannelCopierState.ChannelClosed) {
+          break
         }
-        return state
+      }
+    } finally {
+      if ((state == ChannelCopierState.ChannelClosed) && autoCloseSides) {
+        sink.close()
+        source.close()
+        state = ChannelCopierState.AllClosed
       }
     }
+    return state
   }
 
-  fun spawnCopyThread(name: String = "Channel Copier"): Thread {
+  fun spawnCopyThread(
+    name: String = "Channel Copier",
+    autoCloseSides: Boolean = true,
+    onClose: () -> Unit = {}
+  ): Thread {
     val thread = Thread {
-      copyUntilClose()
+      val state = copyUntilClose(autoCloseSides = autoCloseSides)
+      if (state == ChannelCopierState.AllClosed) {
+        onClose()
+      }
     }
     thread.name = name
     thread.start()
