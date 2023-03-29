@@ -13,8 +13,12 @@ import java.nio.file.StandardOpenOption
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 
-class TailscaleConn(val handle: TailscaleConnHandle) {
-  private val path = Paths.get("/dev/fd/${handle}")
+class TailscaleConn(tailscale: Tailscale, val handle: TailscaleConnHandle) {
+  private val path = if (tailscale.useProcSelfFd) {
+    Paths.get("/proc/self/fd/${handle}")
+  } else {
+    Paths.get("/dev/fd/${handle}")
+  }
 
   fun inputStream(): InputStream = path.inputStream()
   fun outputStream(): OutputStream = path.outputStream()

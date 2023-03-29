@@ -5,6 +5,8 @@ import gay.pizza.tailscale.lib.*
 class Tailscale(internal val lib: LibTailscale = LibTailscaleLoader.load()) {
   private val handle: TailscaleHandle = lib.tailscale_new()
 
+  var useProcSelfFd: Boolean = false
+
   var hostname: String
     get() = throw UnsupportedOperationException("API does not support reading.")
     set(value) = check(lib.tailscale_set_hostname(handle, value))
@@ -40,7 +42,7 @@ class Tailscale(internal val lib: LibTailscale = LibTailscaleLoader.load()) {
   fun dial(network: String, addr: String): TailscaleConn {
     val connHandle = TailscaleConnHandleOut()
     check(lib.tailscale_dial(handle, network, addr, connHandle))
-    return TailscaleConn(connHandle.value)
+    return TailscaleConn(this, connHandle.value)
   }
 
   fun listen(network: String, addr: String): TailscaleListener {
