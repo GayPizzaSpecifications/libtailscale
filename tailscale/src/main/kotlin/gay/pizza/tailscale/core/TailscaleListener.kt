@@ -10,6 +10,12 @@ class TailscaleListener(private val tailscale: Tailscale, private val handle: Ta
     return TailscaleConn(tailscale, out.value)
   }
 
+  fun acceptLoop(until: () -> Boolean = { true }, handler: (TailscaleConn) -> Unit) {
+    while (until()) {
+      handler(accept())
+    }
+  }
+
   fun threadedAcceptLoop(until: () -> Boolean = { true }, handler: (TailscaleConn) -> Unit) {
     while (until()) {
       val conn = accept()

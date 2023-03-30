@@ -1,11 +1,13 @@
 package gay.pizza.tailscale.core
 
+import gay.pizza.tailscale.core.fdio.FdIoProvider
 import gay.pizza.tailscale.lib.*
 
-class Tailscale(internal val lib: LibTailscale = LibTailscaleLoader.load()) {
+class Tailscale(
+  internal val lib: LibTailscale = LibTailscaleLoader.load(),
+  var fdIoProvider: FdIoProvider = FdIoProvider.auto()
+) {
   private val handle: TailscaleHandle = lib.tailscale_new()
-
-  var useProcSelfFd: Boolean = false
 
   var hostname: String
     get() = throw UnsupportedOperationException("API does not support reading.")
